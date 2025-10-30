@@ -37,7 +37,7 @@ Filter available LANDFIRE products based on keyword arguments. Boolean arguments
 -  `hi::Bool`
 -  `geoAreas::String`
 
-### `download(layers, area_of_interest; every=5, kw...)
+### `download(layers, area_of_interest; every=5, kw...)`
 
 Submits a job to the LANDFIRE API where:
 

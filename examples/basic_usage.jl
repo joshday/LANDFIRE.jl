@@ -10,14 +10,14 @@ using LANDFIRE, OSMGeocoder
 @info "LANDFIRE API up and running?" LANDFIRE.healthcheck()
 
 # Get area of interest
-aoi = geocode("Boulder, CO")
-@info "Area of Interest: $(aoi[1].display_name)"
+area = geocode("Boulder, CO")
+@info "Area of Interest: $(area[1].display_name)"
 
 # Choose Products
 prods = LANDFIRE.products(product_name = "13 Anderson Fire Behavior Fuel Models 2022")
 @info "Selected Product: $(prods[1].product_name)"
 
 @info "Downloading data..."
-file = LANDFIRE.download(prods, aoi)
+file = LANDFIRE.download(prods, area)
 
 @info "Done!  Downloaded file at: $file"

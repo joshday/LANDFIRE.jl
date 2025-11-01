@@ -184,5 +184,5 @@ PRODUCTS::Vector{Product} = [
     Product("Succession Classes", "Vegetation", "105SCLASS", "1.0.5", true, true, true, "All"),
     Product("Vegetation Condition Class", "Vegetation", "105VCC", "1.0.5", true, true, true, "All"),
     Product("Vegetation Departure Index", "Vegetation", "105VDEP", "1.0.5", true, true, true, "All"),
-    Product("LANDFIRE Map Zones", "Map Zones", "map_zones", "1.0.0", true, true, true, "All"),
+    Product("Landfire Map Zones", "Map Zones", "map_zones", "1.0.0", true, true, true, "All"),
 ]

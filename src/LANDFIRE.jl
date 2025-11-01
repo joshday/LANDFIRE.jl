@@ -1,4 +1,4 @@
-module LANDFIRE
+module Landfire
 
 using HTTP
 using JSON3

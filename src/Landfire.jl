@@ -117,12 +117,16 @@ Submits a job to the LANDFIRE API.  Returns the job ID as a string.
 """
 function submit(job::Job)
     url = BASE_URL * "/job/submit"
-    body = filter!(x -> !isnothing(x[2]), Dict(
+    body = Dict(
         "Email" => job.email,
         "Layer_List" => join(map(x -> x.layer_name, job.layers), ';'),
         "Area_of_Interest" => job.area_of_interest,
-        (k => getfield(job, k) for k in (:output_projection, :resample_resolution, :edit_rule, :edit_mask, :priority_code))...,
-    ))
+    )
+    isnothing(job.output_projection) || (body["Output_Projection"] = job.output_projection)
+    isnothing(job.resample_resolution) || (body["Resample_Resolution"] = job.resample_resolution)
+    isnothing(job.edit_rule) || (body["Edit_Rule"] = job.edit_rule)
+    isnothing(job.edit_mask) || (body["Edit_Mask"] = job.edit_mask)
+    isnothing(job.priority_code) || (body["Priority_Code"] = job.priority_code)
     res = HTTP.post(url, HEADER, JSON3.write(body))
     return JSON3.read(res.body).jobId
 end

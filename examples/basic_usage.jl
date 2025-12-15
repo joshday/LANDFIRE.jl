@@ -1,23 +1,20 @@
 # Basic usage examples for Landfire.jl
 
-using Pkg
-Pkg.activate(temp = true)
-Pkg.add("OSMGeocoder")
-Pkg.develop(path=joinpath(@__DIR__, ".."))
-
 using Landfire, OSMGeocoder
 
 @info "Landfire API up and running?" Landfire.healthcheck()
 
 # Get area of interest
-area = geocode("Boulder, CO")
+area = geocode(city="Boulder", state="CO")
 @info "Area of Interest: $(area[1].display_name)"
 
 # Choose Products
-prods = Landfire.products(product_name = "13 Anderson Fire Behavior Fuel Models 2022")
-@info "Selected Product: $(prods[1].product_name)"
+# See Landfire.products() for full list
+prods = Landfire.products(layer = "250FBFM13", conus=true)
+@info "Selected Product: $(prods[1].name)"
 
-@info "Downloading data..."
-file = Landfire.download(prods, area)
 
-@info "Done!  Downloaded file at: $file"
+@info "Retrieving data"
+data = Landfire.Dataset(prods, area)
+
+@info "Files downloaded" Landfire.files(data)

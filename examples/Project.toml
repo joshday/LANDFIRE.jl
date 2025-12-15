@@ -1,0 +1,6 @@
+[deps]
+Landfire = "16f38fd6-0379-4569-89bb-2d3d56e50de8"
+OSMGeocoder = "28a637ce-2736-498a-9075-487c6d86a7c1"
+
+[sources]
+Landfire = {path = ".."}

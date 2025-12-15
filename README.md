@@ -6,6 +6,9 @@ A Julia client for the [Landfire Product Service API](https://lfps.usgs.gov/docs
 
 ## Quickstart
 
+- The LANDFIRE API requires an email address.
+- Consider adding `ENV["LANDFIRE_EMAIL"] = <my email>` to `~/.julia/config/startup.jl`
+
 ```julia
 using Landfire, OSMGeocoder
 
@@ -16,32 +19,33 @@ Landfire.healthcheck()
 area = geocode("Boulder, CO")
 
 # Choose Product(s):
-prods = Landfire.products(product_name = "13 Anderson Fire Behavior Fuel Models 2022")
+prods = Landfire.products(name = "Fire Behavior Fuel Models")
 
-# Download .zip file:
-file = Landfire.download(prods, area)
+# Get Dataset
+data = Landfire.Dataset(prods, area)
+
+# See what was downloaded:
+files = Landfire.files(data)
+
+# For low level usage (submitting Jobs, etc.), see the source code
 ```
 
 ## API
 
-### `products(; kw...)`
+### `products(latest=true; kw...)`
 
-Filter available Landfire products based on keyword arguments. Boolean arguments are exact matches. String arguments use substring matches, e.g. using product_name="Vegetation" will match all products with "Vegetation" in the product name.
+Filter available Landfire products based on keyword arguments. Boolean arguments are exact matches. String arguments use substring matches, e.g. using name="Vegetation" will match all products with "Vegetation" in the product name.  For `latest=true`, only the latest version of each product is returned.
 
--  `product_name::String`
+
+| Keyword | Description |
+|---------|-------------|
+`name` | Spoken name of layer
+
+-  `name::String`
 -  `theme::String`
--  `layer_name::String`
+-  `layer::String`
 -  `version::String`
--  `conus::Bool`
--  `ak::Bool`
--  `hi::Bool`
+-  `conus::Bool` (available for contiguous US states?)
+-  `ak::Bool` (available for Alaska?)
+-  `hi::Bool`: (available for Hawaii?)
 -  `geoAreas::String`
-
-### `download(layers, area_of_interest; every=5, kw...)`
-
-Submits a job to the Landfire API where:
-
-- `layers::Vector{Product}`
-- `area_of_interest` can be one of `String`/`Integer` (inserted verbatim), an `Extents.Extent`, or a GeoInterface-compatible geometry.
-
-This function is blocking.  To run simultaneous jobs, you'll need to use the lower level `Job` struct and `submit` function.

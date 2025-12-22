@@ -10,8 +10,8 @@ area = geocode(city="Boulder", state="CO")
 
 # Choose Products
 # See Landfire.products() for full list
-prods = Landfire.products(layer = "250FBFM13", conus=true)
-@info "Selected Product: $(prods[1].name)"
+prods = Landfire.products(conus=true)
+@info "Selected Product:" prods
 
 
 @info "Retrieving data"

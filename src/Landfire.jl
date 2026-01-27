@@ -77,9 +77,7 @@ function products(only_latest::Bool = true; kw...)
         end
         filter!(out) do prod
             prod.version == maximum(versions[prod.name]) &&
-                !occursin("2019", prod.name) &&
-                !occursin("2020", prod.name) &&
-                !occursin("2022", prod.name)
+                !occursin(r" \d{4}$", prod.name)  # Exclude year-specific editions (e.g., "Product Name 2019")
         end
     end
     return out

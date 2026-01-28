@@ -158,6 +158,22 @@ end
 
 Job(layers::Vector{Product}, aoi; kw...) = Job(; layers, area_of_interest = area_of_interest(aoi), kw...)
 
+# Content-based hash for caching (Vector hash uses object identity by default)
+function Base.hash(job::Job, h::UInt)
+    h = hash(job.email, h)
+    for layer in job.layers
+        h = hash(layer.name, h)
+        h = hash(layer.layer, h)
+        h = hash(layer.version, h)
+    end
+    h = hash(job.area_of_interest, h)
+    h = hash(job.output_projection, h)
+    h = hash(job.resample_resolution, h)
+    h = hash(job.edit_rule, h)
+    h = hash(job.edit_mask, h)
+    hash(job.priority_code, h)
+end
+
 """
     area_of_interest(x)
 
@@ -294,6 +310,7 @@ function Base.get(data::Dataset; every=5, timeout=3600)
     if !isdir(data.dir)
         @info "Downloading dataset to $(data.file)"
         download(data.job; file=data.file, every=every, timeout=timeout)
+        @info "Extracting dataset to $(data.dir)"
         extract(data.file, data.dir)
     else
         @info "Using cached directory: $(data.dir)"

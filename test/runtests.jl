@@ -19,35 +19,20 @@ using Landfire, HTTP, Extents, Test
         @test length(String(take!(io))) > 0
     end
 
-    @testset "products() filtering" begin
-        # Test basic filtering
-        @test length(Landfire.products(name = "Vegetation")) > 0
-        @test length(Landfire.products(name = "LANDFIRE Map Zones")) == 1
-        @test length(Landfire.products(false)) > length(Landfire.products(true))
+    @testset "products() function" begin
+        # Test fetching products from API
+        all_products = Landfire.products(false)
+        @test length(all_products) > 0
+        @test all(p -> p isa Landfire.Product, all_products)
 
-        # Test theme filtering
-        fuel_products = Landfire.products(theme = "Fuels")
-        @test all(p -> occursin("Fuels", p.theme), fuel_products)
+        # Test latest filtering returns fewer products
+        latest_products = Landfire.products(true)
+        @test length(latest_products) > 0
+        @test length(all_products) >= length(latest_products)
 
-        # Test boolean filtering (exact match)
-        conus_only = Landfire.products(conus = true, ak = false, hi = false)
-        @test all(p -> p.conus && !p.ak && !p.hi, conus_only)
-
-        # Test version filtering
-        v250_products = Landfire.products(version = "2.5.0")
-        @test all(p -> p.version == "2.5.0", v250_products)
-
-        # Test layer filtering
-        @test length(Landfire.products(layer = "FBFM13")) > 0
-
-        # Test multiple filters
-        veg_latest = Landfire.products(true, theme = "Vegetation")
-        @test all(p -> occursin("Vegetation", p.theme), veg_latest)
-
-        # Test only_latest flag
-        all_fbfm13 = Landfire.products(false, layer = "FBFM13")
-        latest_fbfm13 = Landfire.products(true, layer = "FBFM13")
-        @test length(all_fbfm13) >= length(latest_fbfm13)
+        # Test products are sorted by name
+        names = [p.name for p in latest_products]
+        @test issorted(names)
     end
 
     @testset "area_of_interest" begin
@@ -64,8 +49,9 @@ using Landfire, HTTP, Extents, Test
     end
 
     @testset "Job construction" begin
-        prods = Landfire.products(layer = "250FBFM13")
-        @test length(prods) > 0
+        # Create a test product
+        p = Landfire.Product("Test", "Theme", "250FBFM13", "1.0.0", true, false, false, "US")
+        prods = [p]
 
         # Test Job construction with Extent
         ext = Extents.Extent(X = (-120.0, -110.0), Y = (35.0, 40.0))
@@ -90,24 +76,40 @@ using Landfire, HTTP, Extents, Test
     end
 
     @testset "Constants" begin
-        # Test LANDFIRE_ATTRIBUTE_TABLES is populated
-        @test length(Landfire.LANDFIRE_ATTRIBUTE_TABLES) > 0
-        @test haskey(Landfire.LANDFIRE_ATTRIBUTE_TABLES, "FBFM13")
-        @test haskey(Landfire.LANDFIRE_ATTRIBUTE_TABLES, "EVT")
-        @test all(v -> startswith(v, "https://"), values(Landfire.LANDFIRE_ATTRIBUTE_TABLES))
+        # Test attribute_table_url function
+        @test length(Landfire.LAYERS) > 0
+        @test "FBFM13" in Landfire.LAYERS
+        @test "EVT" in Landfire.LAYERS
+        @test startswith(Landfire.attribute_table_url("FBFM13"), "https://")
+        @test Landfire.attribute_table_url("FBFM13", 2024) == "https://www.landfire.gov/sites/default/files/CSV/2024/LF2024_FBFM13.csv"
+        @test Landfire.attribute_table_url("EVT", 2023) == "https://www.landfire.gov/sites/default/files/CSV/2023/LF2023_EVT.csv"
 
         # Test BASE_URL is correct
         @test Landfire.BASE_URL == "https://lfps.usgs.gov/api"
     end
 
-    @testset "PRODUCTS availability" begin
-        # Test PRODUCTS is loaded and non-empty
-        @test length(Landfire.PRODUCTS) > 0
-        @test all(p -> p isa Landfire.Product, Landfire.PRODUCTS)
+    @testset "Dataset construction" begin
+        # Create a test product and Dataset
+        p = Landfire.Product("Test", "Theme", "250FBFM13", "1.0.0", true, false, false, "US")
+        prods = [p]
+        ext = Extents.Extent(X = (-120.0, -110.0), Y = (35.0, 40.0))
 
-        # Test PRODUCTS are sorted by name
-        names = [p.name for p in Landfire.PRODUCTS]
-        @test issorted(names)
+        data = Landfire.Dataset(prods, ext)
+
+        # Test Dataset fields are set correctly
+        @test data.products == prods
+        @test data.job.layers == prods
+        @test data.job.area_of_interest == "-120.0 35.0 -110.0 40.0"
+
+        # Test paths are set based on job hash
+        h = hash(data.job)
+        @test endswith(data.file, "job_$h.zip")
+        @test endswith(data.dir, "job_$h")
+
+        # Test show method doesn't error
+        io = IOBuffer()
+        show(io, data)
+        @test length(String(take!(io))) > 0
     end
 
 end

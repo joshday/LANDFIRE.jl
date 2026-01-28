@@ -1,29 +1,32 @@
 module Landfire
 
-using HTTP, JSON3, Extents, Dates, Downloads, StyledStrings
+using HTTP, JSON3, Extents, Dates, Downloads, Scratch, StyledStrings
 using p7zip_jll: p7zip
 import GeoInterface as GI
 
-public healthcheck, products, Job, submit, cancel, status, download, extract, Dataset
+public healthcheck, products, Job, submit, cancel, status, extract, Dataset, files, attribute_table_url, attribute_table
+
+dir() = Scratch.@get_scratch!("landfire_data")
 
 #-----------------------------------------------------------------------------# constants
 const BASE_URL = "https://lfps.usgs.gov/api"
 const HEADER = Dict("Accept" => "application/json", "Content-Type" => "application/json")
 
-#-----------------------------------------------------------------------------# data_dictionary_urls
-const LANDFIRE_ATTRIBUTE_TABLES = Dict(
-    "FBFM13" => "https://landfire.gov/sites/default/files/CSV/LF2024/LF2024_FBFM13.csv",
-    "FBFM40" => "https://landfire.gov/sites/default/files/CSV/LF2024/LF2024_FBFM40.csv",
-    "EVT"  => "https://landfire.gov/sites/default/files/CSV/LF2024/LF2024_EVT.csv",
-    "EVC"  => "https://landfire.gov/sites/default/files/CSV/LF2024/LF2024_EVC.csv",
-    "FVT"  => "https://landfire.gov/sites/default/files/CSV/LF2024/LF2024_FVT.csv",
-    "FVC"  => "https://landfire.gov/sites/default/files/CSV/LF2024/LF2024_FVC.csv",
-    "FRG"    => "https://landfire.gov/sites/default/files/CSV/LF2024/LF2024_FRG.csv",
-    "SCLASS" => "https://landfire.gov/sites/default/files/CSV/LF2024/LF2024_SCLASS.csv",
-    "FDIST" => "https://landfire.gov/sites/default/files/CSV/LF2024/LF2024_FDIST.csv",
-    "HDIST" => "https://landfire.gov/sites/default/files/CSV/LF2024/LF2024_HDIST.csv",
-    "BPS"  => "https://landfire.gov/sites/default/files/CSV/LF2024/LF2024_BPS.csv",
-)
+#-----------------------------------------------------------------------------# attribute_table_url
+const LAYERS = ["FBFM13", "FBFM40", "EVT", "EVC", "FVT", "FVC", "FRG", "SCLASS", "FDIST", "HDIST", "BPS"]
+
+"""
+    attribute_table_url(layer::String, year::Int=2024)
+    attribute_table_url(product::Product)
+
+Return the URL for the LANDFIRE attribute table CSV for the given layer and year.
+
+Available layers: $(join(LAYERS, ", "))
+"""
+function attribute_table_url(layer::String, year::Int=2024)
+    layer in LAYERS || error("Unknown layer: $layer. Available: $(join(LAYERS, ", "))")
+    return "https://www.landfire.gov/sites/default/files/CSV/$year/LF$(year)_$layer.csv"
+end
 
 #-----------------------------------------------------------------------------# healthcheck
 healthcheck() = JSON3.read(HTTP.get("$(BASE_URL)/healthCheck", HEADER).body)
@@ -52,55 +55,73 @@ function Base.show(io::IO, p::Product)
     print(io, " ", p.geoAreas)
 end
 
-include("products.jl")
-
-"""
-    products(only_latest=true; kw...)
-
-Filter available LANDFIRE products based on keyword arguments.  Boolean arguments are exact matches.
-String arguments use substring matches, e.g. using `name="Vegetation"` will match all
-products with "Vegetation" in the product name.  If `only_latest=true` (default), only the most
-recent version of each product is returned.
-$(join(["- `$k::$v`" for (k,v) in zip(fieldnames(Product), fieldtypes(Product))], "\n"))
-"""
-function products(only_latest::Bool = true; kw...)
-    out = filter(PRODUCTS) do p
-        all(kw) do (k, v)
-            val = getfield(p, k)
-            val isa Bool ? (val == v) : occursin(v, val)
-        end
+function attribute_table_url(product::Product)
+    for layer in LAYERS
+        occursin(layer, product.layer) && return attribute_table_url(layer)
     end
-    if only_latest
+    error("No attribute table found for product layer: $(product.layer)")
+end
+
+"""
+    attribute_table(product::Product)
+    attribute_table(layer::String, year::Int=2024)
+
+Download and parse the LANDFIRE attribute table CSV for the given product or layer.
+
+Returns a vector of `NamedTuple`s with column names from the CSV header.
+"""
+function attribute_table(layer::String, year::Int=2024)
+    url = attribute_table_url(layer, year)
+    _parse_csv(String(HTTP.get(url).body))
+end
+
+function attribute_table(product::Product)
+    url = attribute_table_url(product)
+    _parse_csv(String(HTTP.get(url).body))
+end
+
+function _parse_csv(csv::String)
+    # Handle both Unix and Windows line endings
+    csv = replace(csv, "\r\n" => "\n")
+    csv = replace(csv, "\r" => "")
+    lines = split(strip(csv), '\n')
+    header = Symbol.(split(lines[1], ','))
+    return map(lines[2:end]) do line
+        values = split(line, ',')
+        NamedTuple{Tuple(header)}(Tuple(values))
+    end
+end
+
+"""
+    fetch_products() -> Vector{Product}
+
+Fetch the current list of available products from the LANDFIRE API.
+
+Returns a vector of `Product` structs sorted by name.  This function makes a network
+request to `https://lfps.usgs.gov/api/products`.
+"""
+function products(latest::Bool = true)
+    url = "$BASE_URL/products"
+    response = HTTP.get(url, HEADER)
+    obj = JSON3.read(response.body)
+    out = map(obj.products) do x
+        Product(x.productName, x.theme, x.layerName, x.version, x.conus, x.ak, x.hi, x.geoAreas)
+    end
+    sort!(out, by = p -> p.name)
+    if latest
+        # Filter out year-specific editions (e.g., "Product Name 2019")
+        filter!(p -> !occursin(r" \d{4}$", p.name), out)
+        # Keep only the latest version of each product
         versions = Dict{String, Vector{String}}()
         for p in out
             push!(get!(versions, p.name, String[]), p.version)
         end
         filter!(out) do prod
-            prod.version == maximum(versions[prod.name]) &&
-                !occursin(r" \d{4}$", prod.name)  # Exclude year-specific editions (e.g., "Product Name 2019")
+            prod.version == string(maximum(VersionNumber.(versions[prod.name])))
         end
     end
     return out
 end
-
-"""
-    _update_products!!()
-
-Replace the global `PRODUCTS` variable with the latest data from the LANDFIRE API.
-
-If this is required to get latest LANDFIRE products, please open an issue in Landfire.jl.
-"""
-function _update_products!!()
-    url = "$BASE_URL/products"
-    response = HTTP.get(url, HEADER)
-    obj = JSON3.read(response.body)
-    global PRODUCTS = map(obj.products) do x
-        Product(x.productName, x.theme, x.layerName, x.version, x.conus, x.ak, x.hi, x.geoAreas)
-    end
-    sort!(PRODUCTS, by = p -> p.name)
-end
-
-
 
 #-----------------------------------------------------------------------------# Jobs
 @kwdef struct Job
@@ -116,6 +137,16 @@ end
 
 Job(layers::Vector{Product}, aoi; kw...) = Job(; layers, area_of_interest = area_of_interest(aoi), kw...)
 
+"""
+    area_of_interest(x)
+
+Convert various input types to a string format suitable for the LANDFIRE API.
+
+- `Integer`: Converted to string (represents a feature ID)
+- `String`: Passed through unchanged (WKT or custom format)
+- `Extents.Extent`: Converted to space-separated bounds `"xmin ymin xmax ymax"`
+- Any geometry with `GeoInterface.extent`: Extracts extent and converts to bounds
+"""
 area_of_interest(x::Integer) = string(x)
 area_of_interest(s::String) = s
 area_of_interest((; X, Y)::Extents.Extent) = join(string.([X[1], Y[1], X[2], Y[2]]), ' ')
@@ -171,19 +202,27 @@ end
 
 #-----------------------------------------------------------------------------# download
 """
-    download(job::Job; every=5, file)
-    download(layers::Vector{Product}, area_of_interest; every, file, kw...)
+    download(job::Job; every=5, timeout=3600, file)
 
-Submits a job for the specified `layers` and `area_of_interest`, then polls the job status every `every` seconds.
-When the job completes successfully, downloads and returns the path to the output zipfile.  Keyword arguments are passed to the `Job` constructor.
+Submits a job to the LANDFIRE API, polls the job status every `every` seconds, and downloads the result.
+When the job completes successfully, downloads and returns the path to the output zipfile.  The `timeout` parameter
+specifies the maximum time (in seconds) to wait for the job to complete (default: 3600 = 1 hour).
 """
-function download(job::Job; file=tempname() * ".zip", every::Integer=5)
+function download(job::Job; file=joinpath(dir(), "job_$(hash(job)).zip"), every::Integer=5, timeout::Integer=3600)
+    if isfile(file)
+        @info "File already exists: $file"
+        return file
+    end
     id = submit(job)
     @info "Submitted job with ID: $id.  Checking job every $every seconds."
+    start_time = time()
     while true
         for i in 1:every
             sleep(1)
             print('.')
+        end
+        if time() - start_time > timeout
+            error("Job timed out after $timeout seconds. Job ID: $id")
         end
         obj = status(id)
         @info "Job Status: $(obj.status)"
@@ -196,10 +235,13 @@ function download(job::Job; file=tempname() * ".zip", every::Integer=5)
     end
 end
 
-download(layers::Vector{Product}, aoi; file=tempname() * ".zip", every = 5, kw...) = download(Job(layers, aoi; kw...); file, every)
 
 
+"""
+    extract(file, dir=tempdir())
 
+Extract a 7zip archive to the specified directory using p7zip.  Returns the directory path.
+"""
 function extract(file::AbstractString, dir::AbstractString = tempdir())
     run(`$(p7zip()) x $file -o$dir -y`)
     return dir
@@ -213,21 +255,34 @@ A convenience struct that encapsulates a complete LANDFIRE dataset download and 
 
 - `products`: Vector of `Product` structs to download
 - `aoi`: Area of interest (see `Job` constructor for accepted formats)
-- `dir`: Directory to extract files to (default: temporary directory)
 - `kw...`: Additional keyword arguments passed to the `Job` constructor and `download` function.
+
+Files are cached in scratchspace based on the job hash, so repeated calls with the same parameters
+will return the cached result without re-downloading.
 """
 struct Dataset
     products::Vector{Product}
     job::Job
-    file::String
-    dir::String
+    file::String  # path to downloaded zipfile
+    dir::String  # path to extracted directory
 
-    function Dataset(products::Vector{Product}, aoi; file=tempname() * ".zip", dir=mktempdir(), every=5, kw...)
+    function Dataset(products::Vector{Product}, aoi; kw...)
         job = Job(products, aoi; kw...)
-        file = download(job; every, file)
-        dir = extract(file, dir)
-        new(products, job, file, dir)
+        h = hash(job)
+        new(products, job, joinpath(dir(), "job_$h.zip"), joinpath(dir(), "job_$h"))
     end
+end
+
+function download(data::Dataset; every=5, timeout=3600)
+    if isdir(data.dir)
+        @info "Using cached directory: $(data.dir)"
+        return data.dir
+    else
+        @info "Downloading dataset to $(data.file)"
+        download(data.job; file=data.file, every=every, timeout=timeout)
+        extract(data.file, data.dir)
+    end
+    return only(filter(endswith(".tif"), readdir(data.dir; join=true)))
 end
 
 function Base.show(io::IO, data::Dataset)
@@ -238,6 +293,11 @@ function Base.show(io::IO, data::Dataset)
     end
 end
 
+"""
+    files(data::Dataset)
+
+Return a vector of absolute file paths for all files in the extracted dataset directory.
+"""
 files(data::Dataset) = readdir(data.dir; join=true)
 
 

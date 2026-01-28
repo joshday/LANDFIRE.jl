@@ -93,14 +93,26 @@ function _parse_csv(csv::String)
 end
 
 """
-    fetch_products() -> Vector{Product}
+    products(latest=true; kw...) -> Vector{Product}
 
-Fetch the current list of available products from the LANDFIRE API.
+Fetch and filter available products from the LANDFIRE API.
 
 Returns a vector of `Product` structs sorted by name.  This function makes a network
 request to `https://lfps.usgs.gov/api/products`.
+
+## Keyword Arguments
+Filter products by field values.  Boolean fields use exact matching, string fields use substring matching.
+$(join(["- `$k::$v`" for (k,v) in zip(fieldnames(Product), fieldtypes(Product))], "\n"))
+
+## Examples
+```julia
+products(conus=true)              # Only CONUS products
+products(theme="Fuels")           # Products with "Fuels" in theme
+products(layer="FBFM13")          # Products with "FBFM13" in layer name
+products(conus=true, ak=false)    # CONUS only, not Alaska
+```
 """
-function products(latest::Bool = true)
+function products(latest::Bool = true; kw...)
     url = "$BASE_URL/products"
     response = HTTP.get(url, HEADER)
     obj = JSON3.read(response.body)
@@ -108,6 +120,15 @@ function products(latest::Bool = true)
         Product(x.productName, x.theme, x.layerName, x.version, x.conus, x.ak, x.hi, x.geoAreas)
     end
     sort!(out, by = p -> p.name)
+    # Apply keyword filters
+    if !isempty(kw)
+        filter!(out) do p
+            all(kw) do (k, v)
+                val = getfield(p, k)
+                val isa Bool ? (val == v) : occursin(v, val)
+            end
+        end
+    end
     if latest
         # Filter out year-specific editions (e.g., "Product Name 2019")
         filter!(p -> !occursin(r" \d{4}$", p.name), out)

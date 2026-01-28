@@ -112,4 +112,31 @@ using Landfire, HTTP, Extents, Test
         @test length(String(take!(io))) > 0
     end
 
+    @testset "Dataset caching" begin
+        # Create a Dataset with a unique AOI to avoid conflicts
+        p = Landfire.Product("CacheTest", "Theme", "250FBFM13", "1.0.0", true, false, false, "US")
+        ext = Extents.Extent(X = (-99.0, -98.0), Y = (30.0, 31.0))
+        data = Landfire.Dataset([p], ext)
+
+        # Create a mock cached directory with a .tif file
+        mkpath(data.dir)
+        tif_path = joinpath(data.dir, "test_layer.tif")
+        write(tif_path, "mock tif data")
+
+        try
+            # First call should use cached directory
+            result1 = get(data)
+            @test result1 == tif_path
+            @test isfile(result1)
+
+            # Second call should also use cached directory (same result)
+            result2 = get(data)
+            @test result2 == tif_path
+            @test result1 == result2
+        finally
+            # Clean up
+            rm(data.dir; recursive=true, force=true)
+        end
+    end
+
 end

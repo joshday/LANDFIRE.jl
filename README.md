@@ -30,7 +30,7 @@ prods = Landfire.products(conus=true, ak=false) # CONUS only
 data = Landfire.Dataset(prods, "-105.5 39.5 -105.0 40.0")  # xmin ymin xmax ymax
 
 # Download and extract (results are cached)
-tif_file = Landfire.download(data)
+tif_file = get(data)
 
 # List all extracted files
 Landfire.files(data)
@@ -61,7 +61,7 @@ Fetch and filter available products from the LANDFIRE API.
 
 #### `Dataset(products, aoi; kw...)`
 
-Create a Dataset struct for downloading LANDFIRE data. Does not download immediately - call `download(data)` to fetch.
+Create a Dataset struct for downloading LANDFIRE data. Does not download immediately - call `get(data)` to fetch.
 
 - `products`: Vector of `Product` structs
 - `aoi`: Area of interest - can be:
@@ -70,7 +70,7 @@ Create a Dataset struct for downloading LANDFIRE data. Does not download immedia
   - `Extents.Extent`: Bounding box
   - Any geometry with `GeoInterface.extent`
 
-#### `download(data::Dataset; every=5, timeout=3600)`
+#### `get(data::Dataset; every=5, timeout=3600)`
 
 Download and extract the dataset. Returns the path to the `.tif` file. Results are cached in scratchspace.
 

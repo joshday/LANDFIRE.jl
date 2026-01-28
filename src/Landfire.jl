@@ -230,10 +230,6 @@ When the job completes successfully, downloads and returns the path to the outpu
 specifies the maximum time (in seconds) to wait for the job to complete (default: 3600 = 1 hour).
 """
 function download(job::Job; file=joinpath(dir(), "job_$(hash(job)).zip"), every::Integer=5, timeout::Integer=3600)
-    if isfile(file)
-        @info "File already exists: $file"
-        return file
-    end
     id = submit(job)
     @info "Submitted job with ID: $id.  Checking job every $every seconds."
     start_time = time()
@@ -276,7 +272,7 @@ A convenience struct that encapsulates a complete LANDFIRE dataset download and 
 
 - `products`: Vector of `Product` structs to download
 - `aoi`: Area of interest (see `Job` constructor for accepted formats)
-- `kw...`: Additional keyword arguments passed to the `Job` constructor and `download` function.
+- `kw...`: Additional keyword arguments passed to the `Job` constructor.
 
 Files are cached in scratchspace based on the job hash, so repeated calls with the same parameters
 will return the cached result without re-downloading.
@@ -294,14 +290,13 @@ struct Dataset
     end
 end
 
-function download(data::Dataset; every=5, timeout=3600)
-    if isdir(data.dir)
-        @info "Using cached directory: $(data.dir)"
-        return data.dir
-    else
+function Base.get(data::Dataset; every=5, timeout=3600)
+    if !isdir(data.dir)
         @info "Downloading dataset to $(data.file)"
         download(data.job; file=data.file, every=every, timeout=timeout)
         extract(data.file, data.dir)
+    else
+        @info "Using cached directory: $(data.dir)"
     end
     return only(filter(endswith(".tif"), readdir(data.dir; join=true)))
 end

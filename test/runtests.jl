@@ -124,14 +124,12 @@ using Landfire, HTTP, Extents, Test
         write(tif_path, "mock tif data")
 
         try
-            # First call should use cached directory
-            result1 = get(data)
+            # First call should use cached directory and log the cache message
+            result1 = @test_logs (:info, "Using cached directory: $(data.dir)") get(data)
             @test result1 == tif_path
-            @test isfile(result1)
 
-            # Second call should also use cached directory (same result)
-            result2 = get(data)
-            @test result2 == tif_path
+            # Second call should also log the cache message
+            result2 = @test_logs (:info, "Using cached directory: $(data.dir)") get(data)
             @test result1 == result2
         finally
             # Clean up

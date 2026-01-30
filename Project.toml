@@ -1,6 +1,6 @@
 name = "Landfire"
 uuid = "16f38fd6-0379-4569-89bb-2d3d56e50de8"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["Josh Day <emailjoshday@gmail.com> and contributors"]
 
 [deps]

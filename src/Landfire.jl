@@ -4,12 +4,13 @@ using HTTP, JSON3, Extents, Dates, Downloads, Scratch, StyledStrings
 using p7zip_jll: p7zip
 import GeoInterface as GI
 
-public healthcheck, products, Job, submit, cancel, status, extract, Dataset, files, attribute_table_url, attribute_table
+public healthcheck, products, Job, submit, cancel, status, extract, Dataset, files, attribute_table_url, attribute_table, full_product_url, filesize
 
 dir() = Scratch.@get_scratch!("landfire_data")
 
 #-----------------------------------------------------------------------------# constants
 const BASE_URL = "https://lfps.usgs.gov/api"
+const DOWNLOAD_BASE_URL = "https://landfire.gov/data-downloads"
 const HEADER = Dict("Accept" => "application/json", "Content-Type" => "application/json")
 
 #-----------------------------------------------------------------------------# attribute_table_url
@@ -92,15 +93,37 @@ function _parse_csv(csv::String)
     end
 end
 
+products_cache_file() = joinpath(dir(), "products_cache.json")
+
+# Fetch products from API and cache to file
+function _fetch_and_cache_products()
+    url = "$BASE_URL/products"
+    response = HTTP.get(url, HEADER)
+    write(products_cache_file(), response.body)
+    return JSON3.read(response.body)
+end
+
+# Load products from cache or fetch if missing
+function _load_products(; refresh::Bool=false)
+    cache_file = products_cache_file()
+    if refresh || !isfile(cache_file)
+        @info refresh ? "Refreshing products cache..." : "Fetching products (no cache found)..."
+        return _fetch_and_cache_products()
+    end
+    return JSON3.read(read(cache_file, String))
+end
+
 """
-    products(latest=true; kw...) -> Vector{Product}
+    products(latest=true; refresh=false, kw...) -> Vector{Product}
 
 Fetch and filter available products from the LANDFIRE API.
 
-Returns a vector of `Product` structs sorted by name.  This function makes a network
-request to `https://lfps.usgs.gov/api/products`.
+Returns a vector of `Product` structs sorted by name.  Results are cached locally;
+use `refresh=true` to update the cache from the API.
 
 ## Keyword Arguments
+- `refresh::Bool=false` - Set to `true` to refresh the cached product list from the API
+
 Filter products by field values.  Boolean fields use exact matching, string fields use substring matching.
 $(join(["- `$k::$v`" for (k,v) in zip(fieldnames(Product), fieldtypes(Product))], "\n"))
 
@@ -110,12 +133,11 @@ products(conus=true)              # Only CONUS products
 products(theme="Fuels")           # Products with "Fuels" in theme
 products(layer="FBFM13")          # Products with "FBFM13" in layer name
 products(conus=true, ak=false)    # CONUS only, not Alaska
+products(refresh=true)            # Refresh cache and return all latest products
 ```
 """
-function products(latest::Bool = true; kw...)
-    url = "$BASE_URL/products"
-    response = HTTP.get(url, HEADER)
-    obj = JSON3.read(response.body)
+function products(latest::Bool = true; refresh::Bool=false, kw...)
+    obj = _load_products(; refresh)
     out = map(obj.products) do x
         Product(x.productName, x.theme, x.layerName, x.version, x.conus, x.ak, x.hi, x.geoAreas)
     end
@@ -332,6 +354,68 @@ end
 Return a vector of absolute file paths for all files in the extracted dataset directory.
 """
 files(data::Dataset) = readdir(data.dir; join=true)
+
+#-----------------------------------------------------------------------------# Full Product Downloads
+const REGIONS = ["CONUS", "AK", "HI"]
+
+"""
+    full_product_url(layer::String, region::String="CONUS", year::Int=2024)
+    full_product_url(product::Product, region::String="CONUS")
+
+Return the URL for downloading a full extent LANDFIRE product.
+
+- `layer`: Layer name (e.g., "FBFM13", "EVT")
+- `region`: Geographic region ("CONUS", "AK", or "HI")
+- `year`: Product year (default: 2024)
+
+## Example
+```julia
+url = Landfire.full_product_url("FBFM13", "CONUS", 2024)
+# "https://landfire.gov/data-downloads/CONUS_LF2024/LF2024_FBFM13_CONUS.zip"
+
+# Or from a Product (extracts layer name and year from product)
+prod = Landfire.products(layer="FBFM13")[1]
+url = Landfire.full_product_url(prod, "CONUS")
+```
+"""
+function full_product_url(layer::String, region::String="CONUS", year::Int=2024)
+    region = uppercase(region)
+    region in REGIONS || error("Unknown region: $region. Available: $(join(REGIONS, ", "))")
+    folder = "$(region)_LF$year"
+    filename = "LF$(year)_$(layer)_$(region).zip"
+    return "$DOWNLOAD_BASE_URL/$folder/$filename"
+end
+
+function full_product_url(product::Product, region::String="CONUS")
+    # Extract base layer name by removing leading resolution digits (e.g., "250FBFM13" -> "FBFM13")
+    layer = replace(product.layer, r"^\d+" => "")
+    # Extract year from product name (e.g., "Fire Behavior Fuel Model 13 Anderson" with version "LF 2024")
+    # or from version string which contains the year
+    year_match = match(r"(\d{4})", product.version)
+    year = isnothing(year_match) ? 2024 : parse(Int, year_match.captures[1])
+    full_product_url(layer, region, year)
+end
+
+"""
+    filesize(url::String) -> Int
+
+Query the size of a remote file in bytes using an HTTP HEAD request.
+
+Returns the file size, or throws an error if the size cannot be determined.
+
+## Example
+```julia
+url = Landfire.full_product_url("FBFM13")
+size = Landfire.filesize(url)
+@info Base.format_bytes(size)
+```
+"""
+function filesize(url::String)
+    response = HTTP.head(url)
+    content_length = HTTP.header(response, "Content-Length")
+    isempty(content_length) && error("Server did not return Content-Length header")
+    return parse(Int, content_length)
+end
 
 
 end # module

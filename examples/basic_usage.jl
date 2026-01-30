@@ -1,20 +1,42 @@
 # Basic usage examples for Landfire.jl
 
-using Landfire, OSMGeocoder
+using Landfire
 
-@info "Landfire API up and running?" Landfire.healthcheck()
+# Check API health
+@info "Landfire API health check" Landfire.healthcheck()
 
-# Get area of interest
-area = geocode(city="Boulder", state="CO")
-@info "Area of Interest: $(area[1].display_name)"
+# Browse available products
+prods = Landfire.products()  # All latest products (cached)
+@info "Total products available: $(length(prods))"
 
-# Choose Products
-# See Landfire.products() for full list
-prods = Landfire.products(conus=true)
-@info "Selected Product:" prods
+# Filter products
+fuel_prods = Landfire.products(theme="Fuel", conus=true)
+@info "Fuel products for CONUS: $(length(fuel_prods))"
 
+# Select a specific product (FBFM13 - Fire Behavior Fuel Model)
+fbfm13 = Landfire.products(layer="FBFM13", conus=true)
+@info "Selected product:" fbfm13
 
-@info "Retrieving data"
-data = Landfire.Dataset(prods, area)
+# Define area of interest (Boulder, CO area)
+# Format: "xmin ymin xmax ymax" in WGS84
+aoi = "-105.5 39.9 -105.2 40.1"
 
-@info "Files downloaded" Landfire.files(data)
+# Create a Dataset (lazy - doesn't download yet)
+data = Landfire.Dataset(fbfm13, aoi)
+@info "Dataset created" data
+
+# Download and extract (this makes the API call)
+# Uncomment to actually download:
+# tif_file = get(data)
+# @info "Downloaded to:" tif_file
+# @info "All files:" Landfire.files(data)
+
+# Get attribute table for interpreting raster values
+table = Landfire.attribute_table("FBFM13")
+@info "Attribute table has $(length(table)) entries"
+@info "First entry:" table[1]
+
+# Full product download URLs (for large regional downloads)
+url = Landfire.full_product_url("FBFM13", "CONUS", 2024)
+size = Landfire.filesize(url)
+@info "Full CONUS FBFM13 download" url Base.format_bytes(size)

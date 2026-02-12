@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Changelog – Landfire.jl</title>
+<title>Examples – Landfire.jl</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +20,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,8 +65,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./coverage.html" rel="next">
-<link href="./api.html" rel="prev">
+<link href="./api.html" rel="next">
+<link href="./getting-started.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -280,7 +315,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./changelog.html">Reference</a></li><li class="breadcrumb-item"><a href="./changelog.html"><span class="chapter-title">Changelog</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Docs</a></li><li class="breadcrumb-item"><a href="./examples.html"><span class="chapter-title">Examples</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -314,7 +349,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./examples.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Examples</span></a>
+  <a href="./examples.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Examples</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -335,7 +370,7 @@ ul.task-list li input[type="checkbox"] {
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./changelog.html" class="sidebar-item-text sidebar-link active"><span class="chapter-title">Changelog</span></a>
+  <a href="./changelog.html" class="sidebar-item-text sidebar-link"><span class="chapter-title">Changelog</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -355,7 +390,10 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#unreleased" id="toc-unreleased" class="nav-link active" data-scroll-target="#unreleased">Unreleased</a></li>
+  <li><a href="#browse-products" id="toc-browse-products" class="nav-link active" data-scroll-target="#browse-products">Browse Products</a></li>
+  <li><a href="#attribute-tables" id="toc-attribute-tables" class="nav-link" data-scroll-target="#attribute-tables">Attribute Tables</a></li>
+  <li><a href="#full-product-downloads" id="toc-full-product-downloads" class="nav-link" data-scroll-target="#full-product-downloads">Full Product Downloads</a></li>
+  <li><a href="#create-a-dataset" id="toc-create-a-dataset" class="nav-link" data-scroll-target="#create-a-dataset">Create a Dataset</a></li>
   </ul>
 </nav>
     </div>
@@ -363,9 +401,9 @@ ul.task-list li input[type="checkbox"] {
 <main class="content" id="quarto-document-content">
 
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./changelog.html">Reference</a></li><li class="breadcrumb-item"><a href="./changelog.html"><span class="chapter-title">Changelog</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">Docs</a></li><li class="breadcrumb-item"><a href="./examples.html"><span class="chapter-title">Examples</span></a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-title">Changelog</span></h1>
+<h1 class="title"><span class="chapter-title">Examples</span></h1>
 </div>
 
 
@@ -382,8 +420,133 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="unreleased" class="level2">
-<h2 class="anchored" data-anchor-id="unreleased">Unreleased</h2>
+<section id="browse-products" class="level2">
+<h2 class="anchored" data-anchor-id="browse-products">Browse Products</h2>
+<div id="4" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># All latest products (cached locally)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>prods <span class="op">=</span> Landfire.<span class="fu">products</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="ansi-escaped-output">
+<pre>33-element Vector{Landfire.Product}:
+ Product: <span class="ansi-bright-cyan-fg">13 Anderson Fire Behavior Fuel Models</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250FBFM13</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">40 Scott and Burgan Fire Behavior Fuel Models</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250FBFM40</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Aspect</span> <span class="ansi-bright-yellow-fg">Topographic</span> <span class="ansi-bright-magenta-fg">ASP2020</span>, <span class="ansi-bright-black-fg">2.2.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Biophysical Settings</span> <span class="ansi-bright-yellow-fg">Vegetation</span> <span class="ansi-bright-magenta-fg">240BPS</span>, <span class="ansi-bright-black-fg">2.4.0</span> <span class="ansi-bright-red-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-red-fg">hi</span> 
+ Product: <span class="ansi-bright-cyan-fg">Canadian Forest Fire Danger Rating System</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250CFFDRS</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-red-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-red-fg">hi</span> 
+ Product: <span class="ansi-bright-cyan-fg">Elevation</span> <span class="ansi-bright-yellow-fg">Topographic</span> <span class="ansi-bright-magenta-fg">ELEV2020</span>, <span class="ansi-bright-black-fg">2.2.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Existing Vegetation Cover</span> <span class="ansi-bright-yellow-fg">Vegetation</span> <span class="ansi-bright-magenta-fg">250EVC</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Existing Vegetation Height</span> <span class="ansi-bright-yellow-fg">Vegetation</span> <span class="ansi-bright-magenta-fg">250EVH</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Existing Vegetation Type</span> <span class="ansi-bright-yellow-fg">Vegetation</span> <span class="ansi-bright-magenta-fg">250EVT</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Final Annual Disturbance</span> <span class="ansi-bright-yellow-fg">Disturbance</span> <span class="ansi-bright-magenta-fg">DIST2024</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ ⋮
+ Product: <span class="ansi-bright-cyan-fg">National Vegetation Classification</span> <span class="ansi-bright-yellow-fg">Vegetation</span> <span class="ansi-bright-magenta-fg">200NVC</span>, <span class="ansi-bright-black-fg">2.0.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Operational Roads</span> <span class="ansi-bright-yellow-fg">Transportation</span> <span class="ansi-bright-magenta-fg">240ROADS_23</span>, <span class="ansi-bright-black-fg">2.4.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-red-fg">ak</span> <span class="ansi-bright-red-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Percent Fire Severity</span> <span class="ansi-bright-yellow-fg">Fire Regime</span> <span class="ansi-bright-magenta-fg">240PFS</span>, <span class="ansi-bright-black-fg">2.4.0</span> <span class="ansi-bright-red-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-red-fg">hi</span> 
+ Product: <span class="ansi-bright-cyan-fg">Preliminary Annual Disturbance</span> <span class="ansi-bright-yellow-fg">Disturbance</span> <span class="ansi-bright-magenta-fg">PDIST2024</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Slope Degrees</span> <span class="ansi-bright-yellow-fg">Topographic</span> <span class="ansi-bright-magenta-fg">SLPD2020</span>, <span class="ansi-bright-black-fg">2.2.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Slope Percent Rise</span> <span class="ansi-bright-yellow-fg">Topographic</span> <span class="ansi-bright-magenta-fg">SLPP2020</span>, <span class="ansi-bright-black-fg">2.2.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Succession Classes</span> <span class="ansi-bright-yellow-fg">Vegetation</span> <span class="ansi-bright-magenta-fg">250SCLASS</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Vegetation Condition Class</span> <span class="ansi-bright-yellow-fg">Vegetation</span> <span class="ansi-bright-magenta-fg">250VCC</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Vegetation Departure Index</span> <span class="ansi-bright-yellow-fg">Vegetation</span> <span class="ansi-bright-magenta-fg">250VDEP</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All</pre>
+</div>
+</div>
+</div>
+<div id="6" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter by theme</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Landfire.<span class="fu">products</span>(theme<span class="op">=</span><span class="st">"Fuel"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="ansi-escaped-output">
+<pre>12-element Vector{Landfire.Product}:
+ Product: <span class="ansi-bright-cyan-fg">13 Anderson Fire Behavior Fuel Models</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250FBFM13</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">40 Scott and Burgan Fire Behavior Fuel Models</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250FBFM40</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Canadian Forest Fire Danger Rating System</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250CFFDRS</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-red-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-red-fg">hi</span> 
+ Product: <span class="ansi-bright-cyan-fg">Forest Canopy Base Height</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250CBH</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Forest Canopy Bulk Density</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250CBD</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Forest Canopy Cover</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250CC</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Forest Canopy Height</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250CH</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Fuel Characteristic Classification System Fuelbeds</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">240FCCS</span>, <span class="ansi-bright-black-fg">2.4.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Fuel Disturbance</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250FDIST</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Fuel Vegetation Cover</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250FVC</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Fuel Vegetation Height</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250FVH</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+ Product: <span class="ansi-bright-cyan-fg">Fuel Vegetation Type</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250FVT</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All</pre>
+</div>
+</div>
+</div>
+<div id="8" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter by layer name</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Landfire.<span class="fu">products</span>(layer<span class="op">=</span><span class="st">"FBFM13"</span>, conus<span class="op">=</span><span class="cn">true</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="ansi-escaped-output">
+<pre>1-element Vector{Landfire.Product}:
+ Product: <span class="ansi-bright-cyan-fg">13 Anderson Fire Behavior Fuel Models</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250FBFM13</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All</pre>
+</div>
+</div>
+</div>
+</section>
+<section id="attribute-tables" class="level2">
+<h2 class="anchored" data-anchor-id="attribute-tables">Attribute Tables</h2>
+<div id="10" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Download and parse the FBFM13 attribute table</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>table <span class="op">=</span> Landfire.<span class="fu">attribute_table</span>(<span class="st">"FBFM13"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">first</span>(table, <span class="fl">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>5-element Vector{@NamedTuple{VALUE::SubString{String}, FBFM13::SubString{String}, R::SubString{String}, G::SubString{String}, B::SubString{String}, RED::SubString{String}, GREEN::SubString{String}, BLUE::SubString{String}}}:
+ (VALUE = "-9999", FBFM13 = "Fill-NoData", R = "255", G = "255", B = "255", RED = "1", GREEN = "1", BLUE = "1")
+ (VALUE = "1", FBFM13 = "FBFM1", R = "255", G = "255", B = "190", RED = "1", GREEN = "1", BLUE = "0.745098")
+ (VALUE = "2", FBFM13 = "FBFM2", R = "255", G = "255", B = "0", RED = "1", GREEN = "1", BLUE = "0")
+ (VALUE = "3", FBFM13 = "FBFM3", R = "230", G = "197", B = "11", RED = "0.901961", GREEN = "0.772549", BLUE = "0.043137")
+ (VALUE = "4", FBFM13 = "FBFM4", R = "255", G = "211", B = "127", RED = "1", GREEN = "0.827451", BLUE = "0.498039")</code></pre>
+</div>
+</div>
+</section>
+<section id="full-product-downloads" class="level2">
+<h2 class="anchored" data-anchor-id="full-product-downloads">Full Product Downloads</h2>
+<div id="12" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get URL for a full regional product download</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> Landfire.<span class="fu">full_product_url</span>(<span class="st">"FBFM13"</span>, <span class="st">"CONUS"</span>, <span class="fl">2024</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<pre><code>"https://landfire.gov/data-downloads/CONUS_LF2024/LF2024_FBFM13_CONUS.zip"</code></pre>
+</div>
+</div>
+<div id="14" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check file size before downloading</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>size <span class="op">=</span> Landfire.<span class="fu">filesize</span>(url)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="pp">@info</span> <span class="st">"FBFM13 CONUS download size"</span> <span class="bu">Base</span>.<span class="fu">format_bytes</span>(size)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-cyan-fg ansi-bold">┌ </span><span class="ansi-cyan-fg ansi-bold">Info: </span>FBFM13 CONUS download size
+<span class="ansi-cyan-fg ansi-bold">└ </span>  Base.format_bytes(size) = "2.377 GiB"
+</pre>
+</div>
+</div>
+</div>
+</section>
+<section id="create-a-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="create-a-dataset">Create a Dataset</h2>
+<div id="16" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Define area of interest (Boulder, CO area)</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Format: "xmin ymin xmax ymax" in WGS84</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>aoi <span class="op">=</span> <span class="st">"-105.5 39.9 -105.2 40.1"</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>fbfm13 <span class="op">=</span> Landfire.<span class="fu">products</span>(layer<span class="op">=</span><span class="st">"FBFM13"</span>, conus<span class="op">=</span><span class="cn">true</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Dataset (lazy - doesn't download yet)</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> Landfire.<span class="fu">Dataset</span>(fbfm13, aoi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="ansi-escaped-output">
+<pre><span class="ansi-bright-cyan-fg">Landfire.Dataset</span>
+ Area of Interest: -105.5 39.9 -105.2 40.1
+ - Product: <span class="ansi-bright-cyan-fg">13 Anderson Fire Behavior Fuel Models</span> <span class="ansi-bright-yellow-fg">Fuels</span> <span class="ansi-bright-magenta-fg">250FBFM13</span>, <span class="ansi-bright-black-fg">2.5.0</span> <span class="ansi-bright-green-fg">conus</span> <span class="ansi-bright-green-fg">ak</span> <span class="ansi-bright-green-fg">hi</span> All
+</pre>
+</div>
+</div>
+</div>
+<p>To actually download and extract the data:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Download and extract (results are cached)</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>tif_file <span class="op">=</span> <span class="fu">get</span>(data)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># List all extracted files</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>Landfire.<span class="fu">files</span>(data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 </section>
@@ -804,13 +967,13 @@ ul.task-list li input[type="checkbox"] {
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./api.html" class="pagination-link" aria-label="API">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-title">API</span></span>
+      <a href="./getting-started.html" class="pagination-link" aria-label="Getting Started">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Getting Started</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./coverage.html" class="pagination-link" aria-label="Coverage">
-        <span class="nav-page-text"><span class="chapter-title">Coverage</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./api.html" class="pagination-link" aria-label="API">
+        <span class="nav-page-text"><span class="chapter-title">API</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

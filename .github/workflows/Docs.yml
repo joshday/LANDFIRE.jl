@@ -18,6 +18,8 @@ concurrency:
 jobs:
   docs:
     runs-on: ubuntu-latest
+    env:
+      LANDFIRE_EMAIL: ${{ secrets.LANDFIRE_EMAIL }}
     steps:
       - uses: actions/checkout@v6
 

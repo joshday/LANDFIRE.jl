@@ -1,0 +1,26 @@
+---
+title: "Landfire.jl"
+engine: julia
+---
+
+Welcome to the documentation for **Landfire.jl**.
+
+## Overview
+
+Landfire.jl is a Julia client for the [LANDFIRE Product Service API](https://lfps.usgs.gov/docs/api). It provides tools to query, download, and process LANDFIRE geospatial data products used in wildfire and vegetation analysis.
+
+## Installation
+
+```julia
+using Pkg
+Pkg.add("Landfire")
+```
+
+## Quickstart
+
+```{julia}
+using Landfire
+
+# Browse available products
+prods = Landfire.products(layer="FBFM13")
+```

@@ -1,0 +1,71 @@
+---
+title: "Examples"
+engine: julia
+---
+
+```{julia}
+#| echo: false
+#| output: false
+using Landfire
+```
+
+## Browse Products
+
+```{julia}
+# All latest products (cached locally)
+prods = Landfire.products()
+```
+
+```{julia}
+# Filter by theme
+Landfire.products(theme="Fuel")
+```
+
+```{julia}
+# Filter by layer name
+Landfire.products(layer="FBFM13", conus=true)
+```
+
+## Attribute Tables
+
+```{julia}
+# Download and parse the FBFM13 attribute table
+table = Landfire.attribute_table("FBFM13")
+first(table, 5)
+```
+
+## Full Product Downloads
+
+```{julia}
+# Get URL for a full regional product download
+url = Landfire.full_product_url("FBFM13", "CONUS", 2024)
+```
+
+```{julia}
+# Check file size before downloading
+size = Landfire.filesize(url)
+@info "FBFM13 CONUS download size" Base.format_bytes(size)
+```
+
+## Create a Dataset
+
+```{julia}
+# Define area of interest (Boulder, CO area)
+# Format: "xmin ymin xmax ymax" in WGS84
+aoi = "-105.5 39.9 -105.2 40.1"
+
+fbfm13 = Landfire.products(layer="FBFM13", conus=true)
+
+# Create a Dataset (lazy - doesn't download yet)
+data = Landfire.Dataset(fbfm13, aoi)
+```
+
+To actually download and extract the data:
+
+```julia
+# Download and extract (results are cached)
+tif_file = get(data)
+
+# List all extracted files
+Landfire.files(data)
+```
